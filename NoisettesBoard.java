@@ -21,14 +21,13 @@ class NoisettesBoard
     private Picture down = new Picture("BigArrow.png", 180);
 
     //buttons 
-    //private JButton[][] hole = new JButton[4][4];
     private JButton[][] tile = new JButton[4][4];
     private JButton arrowUp = new JButton(up);
     private JButton arrowLeft = new JButton(left);
     private JButton arrowRight = new JButton(right);
     private JButton arrowDown = new JButton(down);
     //squirrels
-    private Squirrels squirrel1 = new Squirrels();
+    private Squirrels squirrel = new Squirrels();
     private Squirrels squirrel2 = new Squirrels();
     
 
@@ -100,34 +99,15 @@ class NoisettesBoard
             
         }
         */
-        /*//tiles
-        for(int i=1; i < 17; i++)
-        {
-            if((i == 3) || (i == 5) || (i == 10) || (i == 16))
-            {
-                //tiles with holes
-                JButton hole = new JButton(holeP);
-                grid.add(hole);
-            }
-            else
-            {
-                JButton tile = new JButton(emptyP);
-                grid.add(tile);
-            }
-            //JButton tile = new JButton(emptyP);
-            //grid.add(tile);
-            
-        }
-        */
         
 
         //adding squirrels
         //red squirrel
-        tile[1][1].setIcon(squirrel1.getRed1()); 
-        tile[1][2].setIcon(squirrel1.getRed2()); 
+        tile[1][1].setIcon(squirrel.getRed1()); 
+        tile[1][2].setIcon(squirrel.getRed2()); 
         //grey squirrel
-        tile[2][2].setIcon(squirrel2.getGrey1()); 
-        tile[3][2].setIcon(squirrel2.getGrey2()); 
+        tile[2][2].setIcon(squirrel.getGrey1()); 
+        tile[3][2].setIcon(squirrel.getGrey2()); 
         //flower
         tile[2][1].setIcon(flowerP); 
 
