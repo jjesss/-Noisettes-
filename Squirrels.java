@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 class Squirrels
 {
     //squirrel pictures
@@ -8,6 +10,9 @@ class Squirrels
     //without nuts
     private Picture grey1nutless = new Picture("GreySquirrel1.png", 0);
     private Picture red1nutless = new Picture("RedSquirrel1.png", 0);
+
+    private Picture head;
+    private Picture tail;
 
     public Picture getRed1()
     {
@@ -28,23 +33,31 @@ class Squirrels
     {
         return grey2;
     }
-
-    public void moveP()
+    
+    public Picture getHead()
     {
-
+        return head;
 
     }
 
-    public void dropNut()
+    public Picture getTail()
     {
-        grey
+        return tail;
 
     }
 
 
     
-    public Squirrels()
+    public Squirrels(int colour)
     {
+        //0 = red
+        if (colour == 0)
+        {
+            this.head = new Picture("RedSquirrel1Nut.png", 270);
+            this.tail = new Picture("RedSquirrel2.png", 270);
+        }
+
+
 
         
     }
