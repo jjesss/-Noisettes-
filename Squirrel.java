@@ -9,6 +9,7 @@ class Squirrel
     private int y;
     private int p;
     private int q;
+    private int degrees;
     
     public Picture getHead()
     {
@@ -38,6 +39,11 @@ class Squirrel
     public int getQ()
     {
         return q;
+    }
+
+    public int getDirection()
+    {
+        return degrees;
     }
 
 
