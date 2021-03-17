@@ -44,7 +44,7 @@ class Squirrel
 
     public int getDirection()
     {
-        return degrees;
+        return this.degrees;
     }
 
 
@@ -68,6 +68,7 @@ class Squirrel
         this.y = y;
         this.p = p;
         this.q = q;
+        this.degrees = degrees;
 
         //0 = red, 1 = grey, 2 = black, 3 = brown
         if (colour == 0)
