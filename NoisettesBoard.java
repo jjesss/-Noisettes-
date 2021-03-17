@@ -6,13 +6,14 @@ class NoisettesBoard implements ActionListener
 {
     //frame and panels
     private JFrame frame = new JFrame();
-    private JPanel mainPanel = new JPanel();
+    private JPanel outerPanel = new JPanel();
     private JPanel panel = new JPanel();
     private JPanel grid = new JPanel();
-    private JPanel pickL = new JPanel();
+    private JPanel pickPanel = new JPanel();
     //layouts
     private BorderLayout panelL = new BorderLayout();
     private GridLayout gridL = new GridLayout(4,4);
+    private FlowLayout flowL = new FlowLayout();
     //pictures
     private Picture emptyP = new Picture("Empty.png", 0);
     private Picture holeP = new Picture("Hole.png", 0);
@@ -23,6 +24,7 @@ class NoisettesBoard implements ActionListener
     private Picture right = new Picture("Arrow.png", 90);
     private Picture down = new Picture("BigArrow.png", 180);
     private Picture[][] picture = new Picture[4][4];
+    private Picture attached = new Picture("SquirrelFlower",0);
     //buttons 
     private JButton[][] tile = new JButton[4][4];
     private JButton arrowUp = new JButton(up);
@@ -41,13 +43,6 @@ class NoisettesBoard implements ActionListener
     private int n;
     private int i;
     private int j;
-    private int level = 0;
-
-    /*void setButton(JButton toChange)
-    {
-
-        tile[i] = toChange;
-    }*/ 
 
     //check if theres a hole
     public boolean checkHoles(int y, int x)
@@ -67,12 +62,14 @@ class NoisettesBoard implements ActionListener
         holesFilled += 1;
         picture[j][i] = holeNutP;
         squirrel[n].dropNut();
-        won();
+        //test if won
+        win();
     }
 
-    public void won()
+    //win when all nuts are in the holes
+    public void win()
     {
-        if(holesFilled == squirrelNo )
+        if( holesFilled == squirrelNo )
         {
             System.out.println(" SUCCESS! ALL THE NUTS ARE IN THE HOLES :) ");
             /*try
@@ -85,17 +82,111 @@ class NoisettesBoard implements ActionListener
             frame.dispose();*/
         }
     }
+    //level one
+    public void levelOne()
+    {
+        resetBoard();
+        squirrelNo = 2;
+        //red squirrel
+        squirrel[0] = new Squirrel(0,1,1,2,1,270,null);
+        //grey squirrel
+        squirrel[1] = new Squirrel(1,2,2,2,3,0,null);
+        
+        //JButton squirrelTile = new JButton(squirrels[n].getHead)
+        //place red squirrel
+        tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
+        tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
+        //place grey squirrel
+        tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
+        tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail()); 
+        //place flower
+        tile[2][1].setIcon(flowerP);
+    }
+    //level 2
+    public void levelTwo()
+    {
+        resetBoard();
+        squirrelNo = 2;
+        //grey squirrel
+        squirrel[0] = new Squirrel(1,1,0,1,1,0,null);
+        //brown squirrel
+        squirrel[1] = new Squirrel(3,2,2,3,2,270,attached);
 
+        //place grey squirrel
+        tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
+        tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
+        //place brown squirrel
+        tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
+        tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail());
+        //place flower
+        tile[1][0].setIcon(flowerP);
+
+    }
+    //level 3
+    public void levelThree()
+    {
+        resetBoard();
+        squirrelNo = 3;
+        //black squirrel
+        squirrel[0] = new Squirrel(2,2,2,1,2,90,null);
+        //red squirrel
+        squirrel[1] = new Squirrel(0,3,0,2,0,90,null);
+        //brown squirrel
+        squirrel[2] = new Squirrel(3,3,1,2,1,90,null);
+
+        //place black squirrel
+        tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
+        tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
+        //place red squirrel
+        tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
+        tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail());
+        //place brown squirrel
+        tile[squirrel[2].getY()][squirrel[2].getX()].setIcon(squirrel[2].getHead()); 
+        tile[squirrel[2].getQ()][squirrel[2].getP()].setIcon(squirrel[2].getTail());
+
+    }
+
+    public void resetBoard()
+    {
+        //adding tiles to buttons
+        for (j = 0; j < 4; j++) 
+        {
+            for (i = 0; i < 4; i++) 
+            {
+                if ((j == 0 && i == 2) || (j == 1 && i == 0) || (j == 2 && i == 1) || (j == 3 && i == 3))
+                {
+                    //adding holes to grid
+                    picture[j][i] = holeP;
+                    tile[j][i].setIcon(holeP);       
+                }
+                else
+                {
+                    //adding empty tiles to grid   
+                    picture[j][i] = emptyP;
+                    tile[j][i].setIcon(emptyP);
+                }
+            }
+        }
+        holesFilled = 0;
+    }
 
     public NoisettesBoard()
     {   
         //Panel layouts
+        outerPanel.setLayout(flowL);
         panel.setLayout(panelL);
         grid.setLayout(gridL);
         panel.add(grid);
-        mainPanel.add(pickL);
-        mainPanel.add(panel);
-
+        outerPanel.add(pickPanel);
+        outerPanel.add(panel);
+        //select levels
+        pickPanel.add(level1);
+        level1.addActionListener(this);
+        pickPanel.add(level2);
+        level2.addActionListener(this);
+        
+        outerPanel.setBorder(null);
+        pickPanel.setBorder(null);
         panel.setBorder(null);
         grid.setBorder(null);
         arrowLeft.setBorder(null);
@@ -103,88 +194,51 @@ class NoisettesBoard implements ActionListener
         arrowDown.setBorder(null);
         arrowRight.setBorder(null);
         
-        //select levels
-        pickL.add(level1);
-        level1.addActionListener(this);
-        pickL.add(level2);
-        level2.addActionListener(this);
 
-        //if(selected)
+        //adding arrows 
+        panel.add("North", arrowUp);
+        arrowUp.addActionListener(this);
+        panel.add("East", arrowRight);
+        arrowRight.addActionListener(this);
+        panel.add("South", arrowDown);
+        arrowDown.addActionListener(this);
+        panel.add("West", arrowLeft); 
+        arrowLeft.addActionListener(this); 
         
-            pickL.setVisible(false);
-            //adding arrows 
-            panel.add("North", arrowUp);
-            arrowUp.addActionListener(this);
-            panel.add("East", arrowRight);
-            arrowRight.addActionListener(this);
-            panel.add("South", arrowDown);
-            arrowDown.addActionListener(this);
-            panel.add("West", arrowLeft); 
-            arrowLeft.addActionListener(this); 
-        
-        
-        
-        
-
-        //if(level == 1)
-        
-
-            //adding tiles to buttons
-            for (j = 0; j < 4; j++) 
+        //adding tiles to buttons
+        for (j = 0; j < 4; j++) 
+        {
+            for (i = 0; i < 4; i++) 
             {
-                for (i = 0; i < 4; i++) 
+                if ((j == 0 && i == 2) || (j == 1 && i == 0) || (j == 2 && i == 1) || (j == 3 && i == 3))
                 {
-                    if ((j == 0 && i == 2) || (j == 1 && i == 0) || (j == 2 && i == 1) || (j == 3 && i == 3))
-                    {
-                        //adding holes to grid
-                        tile[j][i] = new JButton(holeP);
-                        picture[j][i] = holeP;
-                        grid.add(tile[j][i]);
-                        tile[j][i].addActionListener(this);
-                    }
-                    else
-                    {
-                        //adding empty tiles to grid
-                        tile[j][i] = new JButton(emptyP);
-                        picture[j][i] = emptyP;
-                        grid.add(tile[j][i]);
-                        tile[j][i].addActionListener(this);
-                    }
+                    //adding holes to grid
+                    tile[j][i] = new JButton(holeP);
+                    tile[j][i].setBorder(BorderFactory.createEmptyBorder());
+                    picture[j][i] = holeP;
+                    grid.add(tile[j][i]);
+                    tile[j][i].addActionListener(this);
+                }
+                else
+                {
+                    //adding empty tiles to grid
+                    tile[j][i] = new JButton(emptyP);
+                    tile[j][i].setBorder(BorderFactory.createEmptyBorder());
+                    picture[j][i] = emptyP;
+                    grid.add(tile[j][i]);
+                    tile[j][i].addActionListener(this);
                 }
             }
-
-            squirrelNo = 2;
-            //red squirrels
-            squirrel[0] = new Squirrel(0,1,1,2,1,270);
-            //grey squirrels
-            squirrel[1] = new Squirrel(1,2,2,2,3,0);
-            
-            //JButton squirrelTile = new JButton(squirrels[n].getHead)
-            //place red squirrel
-            tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
-            tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
-            //place grey squirrel
-            tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
-            tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail()); 
-            //place flower
-            tile[2][1].setIcon(flowerP);
-        
-        
-
-        //won and end game
-        if(holesFilled == squirrelNo )
-        {
-            System.out.println(" SUCCESS! ALL NUTS ARE IN THE HOLES :) ");
-            frame.dispose();
         }
     
         //Frame
-        frame.setContentPane(panel);
+        frame.setContentPane(outerPanel);
         frame.setTitle("Welcome to Cache Noisette!");
-        frame.setSize(600,600);
+        frame.setSize(700,700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
+    
 
     //method to check if next spot squirrel is moving to is empty
     public boolean isItEmpty(int j, int i)
@@ -213,25 +267,24 @@ class NoisettesBoard implements ActionListener
     {
         JButton button = (JButton)e.getSource();
         //what squirrel selected
-        if ((button.getIcon() == squirrel[0].getHead()))
+        if ((squirrel[0] != null && button.getIcon() == squirrel[0].getHead()))
         {
             n = 0;
-            System.out.println(squirrel[n].getDirection());
         }
-        if ((button.getIcon() == squirrel[1].getHead()))
+        if ((squirrel[1] != null && button.getIcon() == squirrel[1].getHead()))
         {
             n = 1;
-            System.out.println(squirrel[n].getDirection());
+            
         }
         //what level is selected
         if(button == level1)
         {
-            level = 1;
+            levelOne();
             selected = true;
         }
         if(button == level2)
         {
-            level = 2;
+            levelTwo();
             selected = true;
         }
 

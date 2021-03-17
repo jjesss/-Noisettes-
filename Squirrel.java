@@ -9,9 +9,10 @@ class Squirrel
     private int y;
     private int p;
     private int q;
+    private int attachedX;
+    private int attachedY;
     private int colour;
     private int degrees;
-    private int nut = 1;
      
     public Picture getHead()
     {
@@ -77,13 +78,15 @@ class Squirrel
         }
     }
     
-    public Squirrel(int colour, int x, int y, int p, int q, int degrees)
+    public Squirrel(int colour, int x, int y, int p, int q, int degrees, Picture attached, int attachedx, int attachedy)
     {
         //head at (x1,y1) tail at (p,q)
         this.x = x;
         this.y = y;
         this.p = p;
         this.q = q;
+        this.attachedX = attachedx;
+        this.attachedY = attachedy;
         this.degrees = degrees;
         this.colour = colour;
 
