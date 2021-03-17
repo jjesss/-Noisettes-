@@ -9,6 +9,7 @@ class Squirrel
     private int y;
     private int p;
     private int q;
+    private int colour;
     private int degrees;
     private int nut = 1;
      
@@ -58,7 +59,22 @@ class Squirrel
 
     public void dropNut()
     {
-        nut = 0;
+        if (colour == 0)
+        {
+            this.head = new Picture("RedSquirrel1.png", degrees);
+        }
+        else if (colour == 1)
+        {
+            this.head = new Picture("GreySquirrel1.png", degrees);
+        }
+        else if (colour == 2)
+        {
+            this.head = new Picture("BlackSquirrel1.png", degrees);
+        }
+        else if (colour == 3)
+        {
+            this.head = new Picture("BrownSquirrel1.png", degrees);
+        }
     }
     
     public Squirrel(int colour, int x, int y, int p, int q, int degrees)
@@ -69,6 +85,7 @@ class Squirrel
         this.p = p;
         this.q = q;
         this.degrees = degrees;
+        this.colour = colour;
 
         //0 = red, 1 = grey, 2 = black, 3 = brown
         if (colour == 0)
@@ -92,25 +109,5 @@ class Squirrel
             this.tail = new Picture("BrownSquirrel2.png", degrees);
         }
         
-        //dropped nut
-        if(nut == 0)
-        {
-            if (colour == 0)
-            {
-                this.head = new Picture("RedSquirrel1.png", degrees);
-            }
-            else if (colour == 1)
-            {
-                this.head = new Picture("GreySquirrel1.png", degrees);
-            }
-            else if (colour == 2)
-            {
-                this.head = new Picture("BlackSquirrel1.png", degrees);
-            }
-            else if (colour == 3)
-            {
-                this.head = new Picture("BrownSquirrel1.png", degrees);
-            }
-        }
     }
 }
