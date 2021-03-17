@@ -5,12 +5,13 @@ class Squirrel
 
     private Picture head;
     private Picture tail;
+    private Picture flowers;
     private int x;
     private int y;
     private int p;
     private int q;
-    private int attachedX;
-    private int attachedY;
+    private int flowersX;
+    private int flowersY;
     private int colour;
     private int degrees;
      
@@ -22,6 +23,11 @@ class Squirrel
     public Picture getTail()
     {
         return tail;
+    }
+
+    public Picture getFlowers()
+    {
+        return flowers;
     }
 
     public int getX()
@@ -49,6 +55,16 @@ class Squirrel
         return this.degrees;
     }
 
+    public int getFlowersX()
+    {
+        return this.flowersX;
+    }
+
+    public int getFlowersY()
+    {
+        return this.flowersY;
+    }
+
 
     public void move(int y, int x)
     {
@@ -56,6 +72,8 @@ class Squirrel
         this.x = this.x + x;
         this.q = this.q + y;
         this.p = this.p + x;
+        this.flowersY = this.flowersY + y;
+        this.flowersX = this.flowersX + x;
     }
 
     public void dropNut()
@@ -78,15 +96,13 @@ class Squirrel
         }
     }
     
-    public Squirrel(int colour, int x, int y, int p, int q, int degrees, Picture attached, int attachedx, int attachedy)
+    public Squirrel(int colour, int x, int y, int p, int q, int degrees)
     {
         //head at (x1,y1) tail at (p,q)
         this.x = x;
         this.y = y;
         this.p = p;
         this.q = q;
-        this.attachedX = attachedx;
-        this.attachedY = attachedy;
         this.degrees = degrees;
         this.colour = colour;
 
@@ -105,11 +121,53 @@ class Squirrel
         {
             this.head = new Picture("BlackSquirrel1Nut.png", degrees);
             this.tail = new Picture("BlackSquirrel2.png", degrees);
+            this.flowers = new Picture( "SquirrelFlower.png",degrees);
+            if (degrees == 0)
+            {
+                this.flowersX = this.p + 1;
+                this.flowersY = this.q;
+            }
+            else if (degrees == 90)
+            {
+                this.flowersX = this.p;
+                this.flowersY = this.q + 1;
+            }
+            else if (degrees == 180)
+            {
+                this.flowersX = this.p - 1;
+                this.flowersY = this.q;
+            }
+            else if (degrees == 270)
+            {
+                this.flowersX = this.p;
+                this.flowersY = this.q - 1;
+            }
         }
         else if (colour == 3)
         {
             this.head = new Picture("BrownSquirrel1Nut.png", degrees);
             this.tail = new Picture("BrownSquirrel2.png", degrees);
+            this.flowers = new Picture( "SquirrelFlower.png",degrees);
+            if (degrees == 0)
+            {
+                this.flowersX = this.x + 1;
+                this.flowersY = this.y;
+            }
+            else if (degrees == 90)
+            {
+                this.flowersX = this.x;
+                this.flowersY = this.y + 1;
+            }
+            else if (degrees == 180)
+            {
+                this.flowersX = this.x - 1;
+                this.flowersY = this.y;
+            }
+            else if (degrees == 270)
+            {
+                this.flowersX = this.x;
+                this.flowersY = this.y - 1;
+            }
         }
         
     }

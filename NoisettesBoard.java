@@ -24,7 +24,6 @@ class NoisettesBoard implements ActionListener
     private Picture right = new Picture("Arrow.png", 90);
     private Picture down = new Picture("BigArrow.png", 180);
     private Picture[][] picture = new Picture[4][4];
-    private Picture attached = new Picture("SquirrelFlower",0);
     //buttons 
     private JButton[][] tile = new JButton[4][4];
     private JButton arrowUp = new JButton(up);
@@ -37,7 +36,6 @@ class NoisettesBoard implements ActionListener
     //squirrel
     private Squirrel[] squirrel = new Squirrel[4];
 
-    private boolean selected = false;
     private int squirrelNo;
     private int holesFilled = 0;
     private int n;
@@ -88,9 +86,9 @@ class NoisettesBoard implements ActionListener
         resetBoard();
         squirrelNo = 2;
         //red squirrel
-        squirrel[0] = new Squirrel(0,1,1,2,1,270,null);
+        squirrel[0] = new Squirrel(0,1,1,2,1,270);
         //grey squirrel
-        squirrel[1] = new Squirrel(1,2,2,2,3,0,null);
+        squirrel[1] = new Squirrel(1,2,2,2,3,0);
         
         //JButton squirrelTile = new JButton(squirrels[n].getHead)
         //place red squirrel
@@ -107,20 +105,21 @@ class NoisettesBoard implements ActionListener
     {
         resetBoard();
         squirrelNo = 2;
-        //grey squirrel
-        squirrel[0] = new Squirrel(1,1,0,1,1,0,null);
+        //black squirrel
+        squirrel[0] = new Squirrel(2, 3,2,3,1, 180);
         //brown squirrel
-        squirrel[1] = new Squirrel(3,2,2,3,2,270,attached);
+        squirrel[1] = new Squirrel(3, 0,2,0,3, 0);
 
         //place grey squirrel
         tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
         tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
+        tile[squirrel[0].getFlowersY()][squirrel[0].getFlowersX()].setIcon(squirrel[0].getFlowers());
         //place brown squirrel
         tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
         tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail());
+        tile[squirrel[1].getFlowersY()][squirrel[1].getFlowersX()].setIcon(squirrel[1].getFlowers());
         //place flower
-        tile[1][0].setIcon(flowerP);
-
+        tile[3][3].setIcon(flowerP);
     }
     //level 3
     public void levelThree()
@@ -128,21 +127,29 @@ class NoisettesBoard implements ActionListener
         resetBoard();
         squirrelNo = 3;
         //black squirrel
-        squirrel[0] = new Squirrel(2,2,2,1,2,90,null);
+        squirrel[0] = new Squirrel(2, 2,2,1,2, 90);
         //red squirrel
-        squirrel[1] = new Squirrel(0,3,0,2,0,90,null);
+        squirrel[1] = new Squirrel(0, 3,0,2,0, 90);
         //brown squirrel
-        squirrel[2] = new Squirrel(3,3,1,2,1,90,null);
+        squirrel[2] = new Squirrel(3, 3,1,2,1, 90);
+        //grey squirrel
+        squirrel[3] = new Squirrel(2, 3, 2, 3, 1, 180);
 
         //place black squirrel
         tile[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
         tile[squirrel[0].getQ()][squirrel[0].getP()].setIcon(squirrel[0].getTail());
+        tile[squirrel[0].getFlowersY()][squirrel[0].getFlowersX()].setIcon(squirrel[0].getFlowers());
         //place red squirrel
         tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
         tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail());
         //place brown squirrel
         tile[squirrel[2].getY()][squirrel[2].getX()].setIcon(squirrel[2].getHead()); 
         tile[squirrel[2].getQ()][squirrel[2].getP()].setIcon(squirrel[2].getTail());
+        tile[squirrel[2].getFlowersY()][squirrel[2].getFlowersX()].setIcon(squirrel[2].getFlowers());
+        //place grey squirres
+        tile[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
+        tile[squirrel[1].getQ()][squirrel[1].getP()].setIcon(squirrel[1].getTail());
+
 
     }
 
@@ -280,12 +287,10 @@ class NoisettesBoard implements ActionListener
         if(button == level1)
         {
             levelOne();
-            selected = true;
         }
         if(button == level2)
         {
             levelTwo();
-            selected = true;
         }
 
 
@@ -293,7 +298,7 @@ class NoisettesBoard implements ActionListener
         if(arrowUp == e.getSource())
         {
             //check if out of bounds
-            if ((squirrel[n].getY() >= 1) && (squirrel[n].getQ() >= 1))
+            if ((squirrel[n].getY() >= 1) && (squirrel[n].getQ() >= 1) && (squirrel[n].getFlowersY() >= 1))
             {
                 //check if valid movement for L/R facing squirrels
                 if ( squirrel[n].getDirection() == 270 || squirrel[n].getDirection() == 90 )
@@ -519,8 +524,6 @@ class NoisettesBoard implements ActionListener
         if(arrowRight == e.getSource())
         {
             //System.out.println( squirrel[n].getDirection() );
-            System.out.println( squirrel[n].getQ() );
-            System.out.println( squirrel[n].getP() +1);
             //check if right is a valid movement
             //facing up and down squirrels
             if (squirrel[n].getDirection() == 0 || squirrel[n].getDirection() == 180)
