@@ -14,6 +14,7 @@ class NoisettesBoard implements ActionListener
     //pictures
     private Picture emptyP = new Picture("Empty.png", 0);
     private Picture holeP = new Picture("Hole.png", 0);
+    private Picture holeNutP = new Picture("HoleNut.png", 0);
     private Picture flowerP = new Picture("Flower.png", 0);
     private Picture up = new Picture("BigArrow.png", 0);
     private Picture left = new Picture("Arrow.png", 270);
@@ -26,22 +27,28 @@ class NoisettesBoard implements ActionListener
     private JButton arrowLeft = new JButton(left);
     private JButton arrowRight = new JButton(right);
     private JButton arrowDown = new JButton(down);
-   
+    //private JButton originalI = new JButton();
 
+    //squirrel
+    private Squirrel[] squirrel = new Squirrel[4];
+    private int squirrelNo;
     private int n;
     private int i;
     private int j;
-    private int squirrelNo;
-    //squirrel
-    private Squirrel[] squirrel = new Squirrel[4];
     
 
     /*void setButton(JButton toChange)
     {
 
         tile[i] = toChange;
+    }*/ 
+
+    /*public void hasNut()
+    {
+        //change the original icon to hole with nut
+        originalI = new JButton(holeNutP);
+        tile[j][i].setIcon()
     }*/
-        
 
     public NoisettesBoard()
     {   
@@ -88,10 +95,11 @@ class NoisettesBoard implements ActionListener
         panel.add("South", arrowDown);
         arrowDown.addActionListener(this);
         panel.add("West", arrowLeft); 
-        arrowLeft.addActionListener(this);
-
+        arrowLeft.addActionListener(this); 
+    
         //select levels
 
+        //level 1
         squirrelNo = 2;
         //red squirrels
         squirrel[0] = new Squirrel(0,1,1,2,1,270);
@@ -108,6 +116,13 @@ class NoisettesBoard implements ActionListener
         //place flower
         tile[2][1].setIcon(flowerP);
 
+        //dropping nuts
+        if(tile[squirrel[n].getY()][squirrel[n].getX()].getIcon() == holeP)
+        {
+            squirrel[n].dropNut();
+            tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(holeNutP);
+        }
+
         //Frame
         frame.setContentPane(panel);
         frame.setTitle("Welcome to Cache Noisette!");
@@ -116,6 +131,7 @@ class NoisettesBoard implements ActionListener
         frame.setVisible(true);
     }
     
+    //method to check if next spot squirrel is moving to is empty
     public boolean isItEmpty(int j, int i)
     {
         boolean empty = false;
@@ -132,37 +148,34 @@ class NoisettesBoard implements ActionListener
                 empty = false;
             }
         }
-       
         return empty;
     }
  
     @Override
     public void actionPerformed(ActionEvent e) 
     {
-        // TODO Auto-generated method stub
         JButton button = (JButton)e.getSource();
-
         //what squirrel selected
         if ((button.getIcon() == squirrel[0].getHead()))
         {
-            squirrel[n] = squirrel[0];
+            n = 0;
         }
         if ((button.getIcon() == squirrel[1].getHead()))
         {
-            squirrel[n] = squirrel[1];
+            n = 1;
         }
 
-        //UP ARROW
+        //UP ARROW pressed
         if(arrowUp == e.getSource())
         {
-            //check up is a valid movement
+            //check if out of bounds
             if ((squirrel[n].getY() >= 1) && (squirrel[n].getQ() >= 1))
             {
-                //horizontal squirrels
+                //check if valid movement for L/R facing squirrels
                 if ( squirrel[n].getDirection() == 270 || squirrel[n].getDirection() == 90 )
                 {
-                    //check head and tail
-                    if ( isItEmpty(squirrel[n].getY() - 1, squirrel[n].getX()) && isItEmpty(squirrel[n].getQ()-1, squirrel[n].getP()))
+                    //check head and tail allowed to move
+                    if ( isItEmpty(squirrel[n].getY() - 1, squirrel[n].getX()) && isItEmpty(squirrel[n].getQ() - 1, squirrel[n].getP()))
                     {
                         //remove squirrel
                         tile[squirrel[n].getY() - 1][squirrel[n].getX()].setIcon(emptyP);
@@ -179,7 +192,7 @@ class NoisettesBoard implements ActionListener
                 //facing up squirrels
                 else if (squirrel[n].getDirection() == 0)
                 {
-                    //check only head
+                    //check if head allowed to move
                     if (isItEmpty(squirrel[n].getY()-1,squirrel[n].getX()))
                     {
                         //remove squirrel
@@ -192,7 +205,7 @@ class NoisettesBoard implements ActionListener
                         tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
                     }
                 }
-                //for facing down squirrels check only tail
+                //for facing down squirrels check if tail allowed to move
                 else if ( (squirrel[n].getDirection() == 180) && (isItEmpty(squirrel[n].getQ()-1, squirrel[n].getP())) )
                 {
                     //remove squirrel
@@ -203,56 +216,175 @@ class NoisettesBoard implements ActionListener
                     //place squirrel
                     tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
                     tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
-                
                 }
                 
             }
         }
-        else if(arrowDown == e.getSource())
+
+        //DOWN ARROW pressed
+        if(arrowDown == e.getSource())
         {
             //check down is a valid movement
             if ((squirrel[n].getY() <= 2) && (squirrel[n].getQ() <= 2))
             {
-                //remove squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
-                //move squirrel down
-                squirrel[n].move(1, 0);
-                //place squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                //for horizontal squirrels
+                if ( squirrel[n].getDirection() == 270 || squirrel[n].getDirection() == 90 )
+                {
+                    //check head and tail
+                    if ( isItEmpty(squirrel[n].getY() + 1, squirrel[n].getX()) && isItEmpty(squirrel[n].getQ() + 1, squirrel[n].getP()))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel down
+                        squirrel[n].move(1, 0);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+                //facing down squirrels
+                else if (squirrel[n].getDirection() == 180)
+                {
+                    //check if head moveable
+                    if (isItEmpty(squirrel[n].getY()+1,squirrel[n].getX()))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel down
+                        squirrel[n].move(1, 0);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+                //for facing up squirrels check only tail
+                else if ( (squirrel[n].getDirection() == 0) && (isItEmpty(squirrel[n].getQ()+1, squirrel[n].getP())) )
+                {
+                    //remove squirrel
+                    tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                    tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                    //move squirrel down
+                    squirrel[n].move(1, 0);
+                    //place squirrel
+                    tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                    tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                }
             }
         }
-        else if(arrowLeft == e.getSource())
+
+        //LEFT ARROW pressed
+        if(arrowLeft == e.getSource())
         {
             //check if left is a valid movement
             if ((squirrel[n].getX() >= 1) && (squirrel[n].getP() >= 1))
             {
-                //remove squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
-                //move squirrel left
-                squirrel[n].move(0, -1);
-                //place squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail()); 
-            }
-           
+                //for up and down facing squirrels 
+                if ( squirrel[n].getDirection() == 180 || squirrel[n].getDirection() == 0 )
+                {
+                    //check head and tail moveable
+                    if ( isItEmpty(squirrel[n].getY(), squirrel[n].getX()-1) && isItEmpty(squirrel[n].getQ(), squirrel[n].getP()-1))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel left
+                        squirrel[n].move(0, -1);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+                //for facing left facing squirrels
+                else if (squirrel[n].getDirection() == 270) 
+                {
+                    //check only head moveable
+                    if(isItEmpty(squirrel[n].getY(), squirrel[n].getX()-1))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel left
+                        squirrel[n].move(0, -1);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+
+                //for facing right facing squirrels
+                else if (squirrel[n].getDirection() == 90) 
+                {
+                    //check only tail moveable
+                    if(isItEmpty(squirrel[n].getQ(), squirrel[n].getP()-1))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel left
+                        squirrel[n].move(0, -1);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+            }  
         }
-        else if(arrowRight == e.getSource())
+
+        //RIGHT ARROW pressed
+        if(arrowRight == e.getSource())
         {
             //check if right is a valid movement
-            if((squirrel[n].getX() <= 2) && (squirrel[n].getP() <= 2))
-            {    
-                //remove squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
-                //move squirrel right
-                squirrel[n].move(0, 1);
-                //place squirrel
-                tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
-            } 
+            //facing up and down squirrels
+            if (squirrel[n].getDirection() == 0 || squirrel[n].getDirection() == 180)
+            {
+                //check if head and tail are free to move
+                if (isItEmpty(squirrel[n].getY(),squirrel[n].getX() + 1) && isItEmpty(squirrel[n].getQ(), squirrel[n].getP() +1))
+                {
+                    //remove squirrel
+                    tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                    tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                    //move squirrel right
+                    squirrel[n].move(0, 1);
+                    //place squirrel
+                    tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                    tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                }
+            
+                //for facing right facing squirrels
+                else if (squirrel[n].getDirection() == 90) 
+                {
+                    //check only head moveable
+                    if(isItEmpty(squirrel[n].getY(), squirrel[n].getX()+1))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel left
+                        squirrel[n].move(0, -1);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                }
+                //for left facing squirrels check if tail free to move
+                else if (squirrel[n].getDirection() == 270)
+                {
+                    if(isItEmpty(squirrel[n].getQ(), squirrel[n].getP() + 1))
+                    {
+                        //remove squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(emptyP); 
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(emptyP);
+                        //move squirrel right
+                        squirrel[n].move(0, 1);
+                        //place squirrel
+                        tile[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
+                        tile[squirrel[n].getQ()][squirrel[n].getP()].setIcon(squirrel[n].getTail());
+                    }
+                   
+                }
+            }
         }
     }
 }
