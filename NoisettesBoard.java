@@ -25,7 +25,7 @@ class NoisettesBoard implements ActionListener
     private Picture down = new Picture("BigArrow.png", 180);
     private Picture[][] picture = new Picture[4][4];
     //buttons 
-    private JButton[][] tile = new JButton[4][4];
+    private JButton[][] tileB = new JButton[4][4];
     private JButton arrowUp = new JButton(up);
     private JButton arrowLeft = new JButton(left);
     private JButton arrowRight = new JButton(right);
@@ -35,6 +35,8 @@ class NoisettesBoard implements ActionListener
 
     //squirrel
     private Squirrel[] squirrel = new Squirrel[4];
+    //Tile
+    private Tile[][] tile 
 
     private int squirrelNo;
     private int holesFilled = 0;
@@ -162,13 +164,13 @@ class NoisettesBoard implements ActionListener
             {
                 if ((j == 0 && i == 2) || (j == 1 && i == 0) || (j == 2 && i == 1) || (j == 3 && i == 3))
                 {
-                    //adding holes to grid
+                    //picture array has holes
                     picture[j][i] = holeP;
                     tile[j][i].setIcon(holeP);       
                 }
                 else
                 {
-                    //adding empty tiles to grid   
+                    //picture array has empty picture  
                     picture[j][i] = emptyP;
                     tile[j][i].setIcon(emptyP);
                 }
@@ -192,6 +194,7 @@ class NoisettesBoard implements ActionListener
         pickPanel.add(level2);
         level2.addActionListener(this);
         
+        //setting borders to null
         outerPanel.setBorder(null);
         pickPanel.setBorder(null);
         panel.setBorder(null);

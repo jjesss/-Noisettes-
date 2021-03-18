@@ -1,6 +1,6 @@
 import javax.swing.*;
 
-class Squirrel
+public class Squirrel
 {
 
     private Picture head;
