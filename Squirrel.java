@@ -8,8 +8,8 @@ public class Squirrel
     private Picture flowers;
     private int x;
     private int y;
-    private int p;
-    private int q;
+    private int tailX;
+    private int tailY;
     private int flowersX;
     private int flowersY;
     private int colour;
@@ -40,14 +40,14 @@ public class Squirrel
         return y;
     }
 
-    public int getP()
+    public int getTailX()
     {
-        return p;
+        return tailX;
     }
 
-    public int getQ()
+    public int getTailY()
     {
-        return q;
+        return tailY;
     }
 
     public int getDirection()
@@ -70,8 +70,8 @@ public class Squirrel
     {
         this.y = this.y + y;
         this.x = this.x + x;
-        this.q = this.q + y;
-        this.p = this.p + x;
+        this.tailY = this.tailY + y;
+        this.tailX = this.tailX + x;
         this.flowersY = this.flowersY + y;
         this.flowersX = this.flowersX + x;
     }
@@ -96,15 +96,34 @@ public class Squirrel
         }
     }
     
-    public Squirrel(int colour, int x, int y, int p, int q, int degrees)
+    public Squirrel(int colour, int x, int y, int degrees)
     {
         //head at (x1,y1) tail at (p,q)
         this.x = x;
         this.y = y;
-        this.p = p;
-        this.q = q;
         this.degrees = degrees;
         this.colour = colour;
+
+        if(this.degrees == 0)
+        {
+            this.tailX = x;
+            this.tailY = y + 1;
+        }
+        else if(this.degrees == 90)
+        {
+            this.tailX = x - 1;
+            this.tailY = y;
+        }
+        else if(this.degrees == 180)
+        {
+            this.tailX = x;
+            this.tailY = y - 1;
+        }
+        else if(this.degrees == 270)
+        {
+            this.tailX = x + 1;
+            this.tailY = y;
+        }
 
         //0 = red, 1 = grey, 2 = black, 3 = brown
         if (colour == 0)
@@ -122,25 +141,25 @@ public class Squirrel
             this.head = new Picture("BlackSquirrel1Nut.png", degrees);
             this.tail = new Picture("BlackSquirrel2.png", degrees);
             this.flowers = new Picture( "SquirrelFlower.png",degrees);
-            if (degrees == 0)
+            if(degrees == 0)
             {
-                this.flowersX = this.p + 1;
-                this.flowersY = this.q;
+                this.flowersX = this.tailX + 1;
+                this.flowersY = this.tailY;
             }
             else if (degrees == 90)
             {
-                this.flowersX = this.p;
-                this.flowersY = this.q + 1;
+                this.flowersX = this.tailX;
+                this.flowersY = this.tailY + 1;
             }
             else if (degrees == 180)
             {
-                this.flowersX = this.p - 1;
-                this.flowersY = this.q;
+                this.flowersX = this.tailX - 1;
+                this.flowersY = this.tailY;
             }
             else if (degrees == 270)
             {
-                this.flowersX = this.p;
-                this.flowersY = this.q - 1;
+                this.flowersX = this.tailX;
+                this.flowersY = this.tailY - 1;
             }
         }
         else if (colour == 3)
