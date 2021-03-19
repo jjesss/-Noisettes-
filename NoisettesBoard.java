@@ -42,20 +42,37 @@ class NoisettesBoard implements ActionListener
 
     private int squirrelNo;
     private int holesFilled = 0;
-    private int n;
+    private int selected;
     private int i;
     private int j;
+
+
+    //method to check if next spot squirrel is moving to is empty
+    public boolean isItEmpty(int j, int i)
+    {
+        boolean empty = false;
+        //check its moving to an empty tile
+        if ( (gridB[j][i].getIcon() == emptyP) || (gridB[j][i].getIcon() == holeP) || (gridB[j][i].getIcon() == holeNutP) )
+        {
+            empty = true;       
+        }
+        else
+        {
+            empty = false;
+        }
+
+        return empty;
+    }
 
     //check if theres a hole
     public boolean checkHoles(int y, int x)
     {
         boolean hole = false;
 
-        if(tile[y][x].getPicture() == holeP)
+        if(tile[y][x].getPicture() == holeP && tile[y][x].nutInHole() == 0 && squirrel[selected].nut())
         {
             hole = true;
         }
-
         return hole;
     }
 
@@ -64,13 +81,14 @@ class NoisettesBoard implements ActionListener
     {
         holesFilled += 1;
         tile[j][i].setPicture(holeNutP);
+        tile[j][i].setNutInHole();
         squirrel[n].dropNut();
+
     }
 
     //win when all nuts are in the holes
     public void ifWin()
     {
-        
         if( holesFilled == squirrelNo )
         {
             try
@@ -114,6 +132,7 @@ class NoisettesBoard implements ActionListener
     public void levelOne()
     {
         resetBoard();
+        System.out.println("level 1");
         squirrelNo = 2;
         //red squirrel
         squirrel[0] = new Squirrel(0,1,1,270);
@@ -134,6 +153,7 @@ class NoisettesBoard implements ActionListener
     public void levelTwo()
     {
         resetBoard();
+        System.out.println("level 2");
         squirrelNo = 2;
         //black squirrel
         squirrel[0] = new Squirrel(2, 3,2, 180);
@@ -155,15 +175,16 @@ class NoisettesBoard implements ActionListener
     public void levelThree()
     {
         resetBoard();
+        System.out.println("level 3");
         squirrelNo = 3;
         //black squirrel
-        squirrel[0] = new Squirrel(2, 2,2, 90);
+        squirrel[0] = new Squirrel(2, 2,1, 180);
         //red squirrel
-        squirrel[1] = new Squirrel(0, 3,0, 90);
+        squirrel[1] = new Squirrel(0, 0,2, 270);
         //brown squirrel
-        squirrel[2] = new Squirrel(3, 3,1, 90);
+        squirrel[2] = new Squirrel(3, 2,3, 180);
         //grey squirrel
-        squirrel[3] = new Squirrel(2, 3,2, 180);
+        squirrel[3] = new Squirrel(1, 3,2, 180);
 
         //place black squirrel
         gridB[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
@@ -177,8 +198,126 @@ class NoisettesBoard implements ActionListener
         gridB[squirrel[2].getTailY()][squirrel[2].getTailX()].setIcon(squirrel[2].getTail());
         gridB[squirrel[2].getFlowersY()][squirrel[2].getFlowersX()].setIcon(squirrel[2].getFlowers());
         //place grey squirres
-        gridB[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
-        gridB[squirrel[1].getTailY()][squirrel[1].getTailX()].setIcon(squirrel[1].getTail());
+        gridB[squirrel[3].getY()][squirrel[3].getX()].setIcon(squirrel[3].getHead()); 
+        gridB[squirrel[3].getTailY()][squirrel[3].getTailX()].setIcon(squirrel[3].getTail());
+    }
+
+    public void moveUp()
+    {
+        //remove squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(tile[squirrel[selected].getY()][squirrel[selected].getX()].getPicture());
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(tile[squirrel[selected].getTailY()][squirrel[selected].getTailX()].getPicture());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //remove flower
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(tile[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].getPicture());
+        }
+        //move squirrel up
+        squirrel[selected].move(-1, 0);
+        //check if a hole is filled
+        if(this.checkHoles(squirrel[selected].getY(), squirrel[selected].getX()))
+        {
+            this.aHoleFilled(squirrel[selected].getY(), squirrel[selected].getX(), selected);
+            System.out.println("Yay a hole is filled.  " + (squirrelNo-holesFilled) + " left to fill.");
+            
+        }
+        //place squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(squirrel[selected].getHead());
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(squirrel[selected].getTail());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(squirrel[selected].getFlowers());
+        }
+        //test for win
+        ifWin();
+    }
+
+    public void moveDown()
+    {
+        //remove squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(tile[squirrel[selected].getY()][squirrel[selected].getX()].getPicture()); 
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(tile[squirrel[selected].getTailY()][squirrel[selected].getTailX()].getPicture());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //remove any flowers attached
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(tile[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].getPicture());
+        }
+        //move squirrel down
+        squirrel[selected].move(1, 0);
+        //check if a hole is filled
+        if(this.checkHoles(squirrel[selected].getY(), squirrel[selected].getX()))
+        {
+            this.aHoleFilled(squirrel[selected].getY(), squirrel[selected].getX(), selected);
+            System.out.println("Yay a hole is filled " + (squirrelNo-holesFilled) + " left to fill");
+        }
+        //place squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(squirrel[selected].getHead());
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(squirrel[selected].getTail());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //place flower
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(squirrel[selected].getFlowers());
+        }
+        //test for win
+        ifWin();
+    }
+    
+    public void moveLeft()
+    {
+        //remove squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(tile[squirrel[selected].getY()][squirrel[selected].getX()].getPicture()); 
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(tile[squirrel[selected].getTailY()][squirrel[selected].getTailX()].getPicture());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //remove any flowers attached
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(tile[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].getPicture());
+        }
+        //move squirrel left
+        squirrel[selected].move(0, -1);
+        //check if a hole is filled
+        if(this.checkHoles(squirrel[selected].getY(), squirrel[selected].getX()))
+        {
+            this.aHoleFilled(squirrel[selected].getY(), squirrel[selected].getX(), selected);
+            System.out.println("Yay a hole is filled! " + (squirrelNo-holesFilled) + " left to fill ");
+          
+        }
+        //place squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(squirrel[selected].getHead());
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(squirrel[selected].getTail());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //place flower
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(squirrel[selected].getFlowers());
+        }
+        //test for win
+        ifWin();
+    }
+
+    public void moveRight()
+    {
+        //remove squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(tile[squirrel[selected].getY()][squirrel[selected].getX()].getPicture()); 
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(tile[squirrel[selected].getTailY()][squirrel[selected].getTailX()].getPicture());
+        gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(tile[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].getPicture());
+        //move squirrel right
+        squirrel[selected].move(0, 1);
+        //check if a hole is filled
+        if(this.checkHoles(squirrel[selected].getY(), squirrel[selected].getX()))
+        {
+            this.aHoleFilled(squirrel[selected].getY(), squirrel[selected].getX(), selected);
+            System.out.println("Yay a hole is filled! " + (squirrelNo-holesFilled) + " left to fill!  ");
+            
+        }
+        //place squirrel
+        gridB[squirrel[selected].getY()][squirrel[selected].getX()].setIcon(squirrel[selected].getHead());
+        gridB[squirrel[selected].getTailY()][squirrel[selected].getTailX()].setIcon(squirrel[selected].getTail());
+        if (squirrel[selected].getFlowers() != null)
+        {
+            //place flower
+            gridB[squirrel[selected].getFlowersY()][squirrel[selected].getFlowersX()].setIcon(squirrel[selected].getFlowers());
+        }
+        //test for win
+        ifWin();
     }
 
     public NoisettesBoard()
@@ -217,34 +356,7 @@ class NoisettesBoard implements ActionListener
         panel.add("South", arrowDown);
         arrowDown.addActionListener(this);
         panel.add("West", arrowLeft); 
-        arrowLeft.addActionListener(this); 
-        /*
-        //adding tiles to buttons
-        for (j = 0; j < 4; j++) 
-        {
-            for (i = 0; i < 4; i++) 
-            {
-                if ((j == 0 && i == 2) || (j == 1 && i == 0) || (j == 2 && i == 1) || (j == 3 && i == 3))
-                {
-                    //adding holes to grid
-                    tile[j][i] = new JButton(holeP);
-                    tile[j][i].setBorder(BorderFactory.createEmptyBorder());
-                    picture[j][i] = holeP;
-                    grid.add(tile[j][i]);
-                    tile[j][i].addActionListener(this);
-                }
-                else
-                {
-                    //adding empty tiles to grid
-                    tile[j][i] = new JButton(emptyP);
-                    tile[j][i].setBorder(BorderFactory.createEmptyBorder());
-                    picture[j][i] = emptyP;
-                    grid.add(tile[j][i]);
-                    tile[j][i].addActionListener(this);
-                }
-            }
-        }
-        */
+        arrowLeft.addActionListener(this);
 
         for (j = 0; j < 4; j++) 
         {
@@ -278,27 +390,6 @@ class NoisettesBoard implements ActionListener
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-    
-
-    //method to check if next spot squirrel is moving to is empty
-    public boolean isItEmpty(int j, int i)
-    {
-        boolean empty = false;
-        
-        for(squirrelNo = 0; squirrelNo < 2 ; squirrelNo++)
-        {
-            //check its moving to an empty tile
-            if ( (tile[j][i].getPicture() == emptyP) || (tile[j][i].getPicture() == holeP) || (tile[j][i].getPicture() == holeNutP) )
-            {
-                empty = true;       
-            }
-            else
-            {
-                empty = false;
-            }
-        }
-        return empty;
-    }
 
 
     @Override
@@ -308,19 +399,19 @@ class NoisettesBoard implements ActionListener
         //what squirrel selected
         if ((squirrel[0] != null && button.getIcon() == squirrel[0].getHead()))
         {
-            n = 0;
+            selected = 0;
         }
         if ((squirrel[1] != null && button.getIcon() == squirrel[1].getHead()))
         {
-            n = 1;
+            selected = 1;
         }
         if ((squirrel[2] != null && button.getIcon() == squirrel[2].getHead()))
         {
-            n = 2;
+            selected = 2;
         }
         if ((squirrel[3] != null && button.getIcon() == squirrel[3].getHead()))
         {
-            n = 3;
+            selected = 3;
         }
         //what level is selected
         if(button == level1)
@@ -341,57 +432,85 @@ class NoisettesBoard implements ActionListener
         if(arrowUp == e.getSource())
         {
             //check if out of bounds
-            if ((squirrel[n].getY() >= 1) && (squirrel[n].getTailY() >= 1))
+            if (((squirrel[selected].getY() >= 1) && (squirrel[selected].getTailY() >= 1)) && (squirrel[selected].upMoveable()))
             {
-                //check if valid movement for L/R facing squirrels
-                if ( squirrel[n].getDirection() == 270 || squirrel[n].getDirection() == 90 )
+                //check for brown and black squirrel's flowers collision
+                if (squirrel[selected].colour() == 2 || squirrel[selected].colour() == 3 )
                 {
-                    //check head and tail allowed to move
-                    if ( isItEmpty(squirrel[n].getY() - 1, squirrel[n].getX()) && isItEmpty(squirrel[n].getTailY() - 1, squirrel[n].getTailX()))
+                    //check if the location its moving to is empty
+                    if(isItEmpty(squirrel[selected].getFlowersY()-1, squirrel[selected].getFlowersX()))
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel up
-                        squirrel[n].move(-1, 0);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //check if valid movement for L/R facing squirrels
+                        if ( squirrel[selected].getDirection() == 270)
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled.  " + (squirrelNo-holesFilled) + " left to fill.");
-                            
+                            //if black
+                            if (squirrel[selected].colour() == 2)
+                            {
+                                //only check head allowed to move
+                                if(isItEmpty(squirrel[selected].getY() - 1, squirrel[selected].getX()))
+                                {
+                                    this.moveUp();
+                                }
+                            }
+                            //if brown
+                            if (squirrel[selected].colour() == 3)
+                            {
+                                //check tail allowed to move
+                                if ( isItEmpty(squirrel[selected].getTailY()-1, squirrel[selected].getTailX()) )
+                                {
+                                    this.moveUp();
+                                }
+                            }
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-
-                        //test for win
-                        ifWin();
+                        //facing up squirrels
+                        else if (squirrel[selected].getDirection() == 0)
+                        {
+                            //check if head allowed to move
+                            if (isItEmpty(squirrel[selected].getY()-1,squirrel[selected].getX()))
+                            {
+                                this.moveUp();
+                            }
+                        }
+                        //for facing down squirrels check if tail allowed to move
+                        else if ( (squirrel[selected].getDirection() == 180) && (isItEmpty(squirrel[selected].getTailY()-1, squirrel[selected].getTailX())) )
+                        {
+                            this.moveUp();
+                        }
+                        //if brown or black squirrel facing right
+                        else if(squirrel[selected].getDirection() == 90 )
+                        {
+                            //check both head and tails wont collide
+                            if(isItEmpty(squirrel[selected].getY() - 1, squirrel[selected].getX()) && isItEmpty(squirrel[selected].getTailY()-1, squirrel[selected].getTailX()))
+                            {
+                                this.moveUp();
+                            }
+                        }
                     }
                 }
-                //facing up squirrels
-                else if (squirrel[n].getDirection() == 0)
+                else if(squirrel[selected].colour() == 0 || squirrel[selected].colour() == 1 )
                 {
-                    //check if head allowed to move
-                    if (isItEmpty(squirrel[n].getY()-1,squirrel[n].getX()))
+                    //check if valid movement for L/R facing squirrels
+                    if ( squirrel[selected].getDirection() == 270 || squirrel[selected].getDirection() == 90 )
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel up
-                        squirrel[n].move(-1, 0);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //check head and tail allowed to move
+                        if ( isItEmpty(squirrel[selected].getY() - 1, squirrel[selected].getX()) && isItEmpty(squirrel[selected].getTailY()-1, squirrel[selected].getTailX()) )
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled, " + (squirrelNo-holesFilled) + " left to fill.");
-
+                            this.moveUp();
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
+                    }
+                    //facing up squirrels
+                    else if (squirrel[selected].getDirection() == 0)
+                    {
+                        //check if head allowed to move
+                        if (isItEmpty(squirrel[selected].getY()-1,squirrel[selected].getX()))
+                        {
+                            this.moveUp();
+                        }
+                    }
+                    //for facing down squirrels check if tail allowed to move
+                    else if ( (squirrel[selected].getDirection() == 180) && (isItEmpty(squirrel[selected].getTailY()-1, squirrel[selected].getTailX())) )
+                    {
+                        this.moveUp();
                     }
                 }
             }
@@ -401,80 +520,87 @@ class NoisettesBoard implements ActionListener
         if(arrowDown == e.getSource())
         {
             //check down is a valid movement
-            if ((squirrel[n].getY() <= 2) && (squirrel[n].getTailY() <= 2))
+            if (((squirrel[selected].getY() <= 2) && (squirrel[selected].getTailY() <= 2)) && (squirrel[selected].downMoveable()))
             {
-                //for horizontal squirrels
-                if ( squirrel[n].getDirection() == 270 || squirrel[n].getDirection() == 90 )
+                //check for brown and black squirrel's flowers collision
+                if (squirrel[selected].colour() == 2 || squirrel[selected].colour() == 3 )
                 {
-                    //check head and tail
-                    //if ( tile[squirrel[n].getY() + 1][squirrel[n].getX()].isItEmpty() && tile[squirrel[n].getTailY() + 1][squirrel[n].getTailX()].isItEmpty() )
-                    if ( isItEmpty(squirrel[n].getY() + 1, squirrel[n].getX()) && isItEmpty(squirrel[n].getTailY() + 1, squirrel[n].getTailX()))
+                    //check if the location flower is moving to is empty
+                    if(isItEmpty(squirrel[selected].getFlowersY()+1, squirrel[selected].getFlowersX()))
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel down
-                        squirrel[n].move(1, 0);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //if right facing
+                        if(squirrel[selected].getDirection() == 90)
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled " + (squirrelNo-holesFilled) + " left to fill");
+                            //if black
+                            if (squirrel[selected].colour() == 2)
+                            {
+                                //only check head allowed to move
+                                if(isItEmpty(squirrel[selected].getY() + 1, squirrel[selected].getX()))
+                                {
+                                    this.moveDown();
+                                }
+                            }
+                            //if brown
+                            if (squirrel[selected].colour() == 3)
+                            {
+                                //check tail allowed to move
+                                if ( isItEmpty(squirrel[selected].getTailY()+1, squirrel[selected].getTailX()) )
+                                {
+                                    this.moveDown();
+                                }
+                            }
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
-                       
+                        //facing down squirrels
+                        else if (squirrel[selected].getDirection() == 180)
+                        {
+                            //check if head moveable
+                            if (isItEmpty(squirrel[selected].getY()+1,squirrel[selected].getX()))
+                            {
+                                this.moveDown();
+                            }
+                        }
+                        //for facing up squirrels check only tail
+                        else if ( (squirrel[selected].getDirection() == 0) && (isItEmpty(squirrel[selected].getTailY()+1, squirrel[selected].getTailX())) )
+                        {
+                            this.moveDown(); 
+                        }
+                        //if brown or black squirrel facing left
+                        else if(squirrel[selected].getDirection() == 270 )
+                        {
+                            //check both head and tails wont collide
+                            if (isItEmpty(squirrel[selected].getY() + 1, squirrel[selected].getX()) && isItEmpty(squirrel[selected].getTailY() + 1, squirrel[selected].getTailX()))
+                            {
+                                this.moveDown();
+                            }
+                        }
                     }
                 }
-                //facing down squirrels
-                else if (squirrel[n].getDirection() == 180)
+                //for red and grey squirrels
+                else if(squirrel[selected].colour() == 0 || squirrel[selected].colour() == 1 )
                 {
-                    //check if head moveable
-                    if (isItEmpty(squirrel[n].getY()+1,squirrel[n].getX()))
+                    //for horizontal squirrels
+                    if ( squirrel[selected].getDirection() == 270 || squirrel[selected].getDirection() == 90 )
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel down
-                        squirrel[n].move(1, 0);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //check head and tail
+                        if ( isItEmpty(squirrel[selected].getY() + 1, squirrel[selected].getX()) && isItEmpty(squirrel[selected].getTailY() + 1, squirrel[selected].getTailX()))
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled,  " + (squirrelNo-holesFilled) + " left to fill!  ");
-                            
+                            this.moveDown();
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
-                        
                     }
-                }
-                //for facing up squirrels check only tail
-                else if ( (squirrel[n].getDirection() == 0) && (isItEmpty(squirrel[n].getTailY()+1, squirrel[n].getTailX())) )
-                {
-                    //remove squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                    //move squirrel down
-                    squirrel[n].move(1, 0);
-                    //check if a hole is filled
-                    if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                    //facing down squirrels
+                    else if (squirrel[selected].getDirection() == 180)
                     {
-                        this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                        System.out.println("Yay a hole is filled! " + (squirrelNo-holesFilled) + " left to fill! ");
+                        //check if head moveable
+                        if (isItEmpty(squirrel[selected].getY()+1,squirrel[selected].getX()))
+                        {
+                            this.moveDown();
+                        }
                     }
-                    //place squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                    //test for win
-                    ifWin();
-                   
+                    //for facing up squirrels check only tail
+                    else if ( (squirrel[selected].getDirection() == 0) && (isItEmpty(squirrel[selected].getTailY()+1, squirrel[selected].getTailX())) )
+                    {
+                        this.moveDown(); 
+                    }
                 }
             }
         }
@@ -483,86 +609,97 @@ class NoisettesBoard implements ActionListener
         if(arrowLeft == e.getSource())
         {
             
-            //check if left is a valid movement
-            if ((squirrel[n].getX() >= 1) && (squirrel[n].getTailX() >= 1))
+            //check if left is a valid movement/not out of bounds
+            if (((squirrel[selected].getX() >= 1) && (squirrel[selected].getTailX() >= 1))  && (squirrel[selected].leftMoveable()))
             {
-                //for up and down facing squirrels 
-                if ( squirrel[n].getDirection() == 180 || squirrel[n].getDirection() == 0 )
+                //check for brown and black squirrel's flowers collision
+                if (squirrel[selected].colour() == 2 || squirrel[selected].colour() == 3 )
                 {
-                    //check head and tail moveable
-                    if ( (isItEmpty(squirrel[n].getY(), squirrel[n].getX()-1)) && (isItEmpty(squirrel[n].getTailY(), squirrel[n].getTailX()-1)) )
+                    System.out.println("1");
+                    //check if the location its moving to is empty
+                    if(isItEmpty(squirrel[selected].getFlowersY(), squirrel[selected].getFlowersX()-1))
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel left
-                        squirrel[n].move(0, -1);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        System.out.println("2");
+                        //for down facing squirrels 
+                        if ( squirrel[selected].getDirection() == 180)
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled! " + (squirrelNo-holesFilled) + " left to fill ");
-                          
+                            //if black
+                            if(squirrel[selected].colour() == 2)
+                            {
+                                //only check head
+                                if ( isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1) )
+                                {
+                                    this.moveLeft();
+                                }
+                            }
+                            //if brown
+                            if(squirrel[selected].colour() == 3)
+                            {
+                                //only check tail 
+                                if ( isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1) )
+                                {
+                                    this.moveLeft();
+                                }
+                            }
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
-                        
+                        //for facing left facing squirrels
+                        else if (squirrel[selected].getDirection() == 270) 
+                        {
+                            //check only head moveable
+                            if(isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1))
+                            {
+                                this.moveLeft();
+                            }
+                        }
+                        //for facing right facing squirrels
+                        else if (squirrel[selected].getDirection() == 90) 
+                        {
+                            //only check tail
+                            if ( isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1) )
+                            {
+                                this.moveLeft();
+                            }
+                        }
+                    }
+                    //if brown/black squirrel facing up
+                    else if(squirrel[selected].getDirection() == 0 )
+                    {
+                        System.out.println("3");
+                        //check both head and tails wont collide
+                        if ((isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1)) && (isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1)))
+                        {
+                            this.moveLeft();
+                        }
                     }
                 }
-                //for facing left facing squirrels
-                else if (squirrel[n].getDirection() == 270) 
+                else if(squirrel[selected].colour() == 0 || squirrel[selected].colour() == 1 )
                 {
-                    //check only head moveable
-                    if(isItEmpty(squirrel[n].getY(), squirrel[n].getX()-1))
+                    //for up and down facing squirrels 
+                    if ( squirrel[selected].getDirection() == 180 || squirrel[selected].getDirection() == 0 )
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel left
-                        squirrel[n].move(0, -1);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //check head and tail moveable
+                        if ( (isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1)) && (isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1)) )
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled, " + (squirrelNo-holesFilled) + " left to fill");
-                            
+                            this.moveLeft();
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
-                      
                     }
-                }
-
-                //for facing right facing squirrels
-                else if (squirrel[n].getDirection() == 90) 
-                {
-                    //check only tail moveable
-                    if(isItEmpty(squirrel[n].getTailY(), squirrel[n].getTailX()-1))
+                    //for facing left facing squirrels
+                    else if (squirrel[selected].getDirection() == 270) 
                     {
-                        //remove squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                        //move squirrel left
-                        squirrel[n].move(0, -1);
-                        //check if a hole is filled
-                        if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                        //check only head moveable
+                        if (isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1))
                         {
-                            this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                            System.out.println("Yay a hole is filled, " + (squirrelNo-holesFilled) + " left to fill! ");
-                           
+                            this.moveLeft();
                         }
-                        //place squirrel
-                        gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                        gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                        //test for win
-                        ifWin();
-                        
+                    }
+                    //for facing right facing squirrels
+                    else if (squirrel[selected].getDirection() == 90) 
+                    {
+                        //check only tail moveable
+                        if(isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1))
+                        {
+                            this.moveLeft();
+                        }
                     }
                 }
             }  
@@ -571,83 +708,94 @@ class NoisettesBoard implements ActionListener
         //RIGHT ARROW pressed
         if(arrowRight == e.getSource())
         {
-            //System.out.println( squirrel[n].getDirection() );
             //check if right is a valid movement
-            //facing up and down squirrels
-            if (squirrel[n].getDirection() == 0 || squirrel[n].getDirection() == 180)
+            if ((squirrel[selected].getX() <= 2) && (squirrel[selected].getTailX() <= 2) && (squirrel[selected].rightMoveable()))
             {
-                //check if head and tail are free to move
-                if (isItEmpty(squirrel[n].getY(),squirrel[n].getX() + 1) && isItEmpty(squirrel[n].getTailY(), squirrel[n].getTailX() + 1))
+                //check for brown and black squirrel's flowers collision
+                if (squirrel[selected].colour() == 2 || squirrel[selected].colour() == 3 )
                 {
-                    //remove squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                    //move squirrel right
-                    squirrel[n].move(0, 1);
-                    //check if a hole is filled
-                    if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                    //check if the location its moving to is empty
+                    if(isItEmpty(squirrel[selected].getFlowersY(), squirrel[selected].getFlowersX()+1))
                     {
-                        this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                        System.out.println("Yay a hole is filled! " + (squirrelNo-holesFilled) + " left to fill!  ");
-                        
+                        //facing up and down squirrels
+                        if (squirrel[selected].getDirection() == 0)
+                        {
+                            //if black
+                            if(squirrel[selected].colour() == 2)
+                            {
+                                //only check head
+                                if ( isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()+1) )
+                                {
+                                    this.moveRight();
+                                }
+                            }
+                            //if brown
+                            if(squirrel[selected].colour() == 3)
+                            {
+                                //only check tail 
+                                if ( isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()+1) )
+                                {
+                                    this.moveRight();
+                                }
+                            }
+                        }
+                        //for facing right facing squirrels
+                        else if (squirrel[selected].getDirection() == 90) 
+                        {
+                            //check only head moveable
+                            if(isItEmpty(squirrel[selected].getY(), squirrel[selected].getX() + 1))
+                            {
+                                this.moveRight();
+                            }
+                        }
+                        //for left facing squirrels check if tail free to move
+                        else if (squirrel[selected].getDirection() == 270)
+                        {
+                            //check tail
+                            if(isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX() + 1) )
+                            {
+                                this.moveRight();
+                            }
+                        }
+                        //if squirrel facing up
+                        else if(squirrel[selected].getDirection() == 180 )
+                        {
+                            //check both head and tails wont collide
+                            if (isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()+1) && isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()+1))
+                            {
+                                this.moveRight();
+                            }
+                        }
                     }
-                    //place squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                    //test for win
-                    ifWin();
-                    
                 }
-            }
-
-            //for facing right facing squirrels
-            else if (squirrel[n].getDirection() == 90) 
-            {
-                //check only head moveable
-                if(isItEmpty(squirrel[n].getY(), squirrel[n].getX() + 1))
+                else if(squirrel[selected].colour() == 0 || squirrel[selected].colour() == 1 )
                 {
-                    //remove squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                    //move squirrel left
-                    squirrel[n].move(0, -1);
-                    //check if a hole is filled
-                    if(this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                    //facing up and down squirrels
+                    if (((squirrel[selected].getDirection() == 0 || squirrel[selected].getDirection() == 180)))
                     {
-                        this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                        System.out.println("Yay a hole is filled. " + (squirrelNo-holesFilled) + " left to fill!");
-                       
+                        //check if head and tail are free to move
+                        if (isItEmpty(squirrel[selected].getY(),squirrel[selected].getX() + 1) && isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX() + 1))
+                        {
+                            this.moveRight(); 
+                        }
                     }
-                    //place squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());  
-                    //test for win
-                    ifWin();  
-                }
-            }
-
-            //for left facing squirrels check if tail free to move
-            else if (squirrel[n].getDirection() == 270)
-            {
-                if ( isItEmpty(squirrel[n].getTailY(), squirrel[n].getTailX() + 1) )
-                {
-                    //remove squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(tile[squirrel[n].getY()][squirrel[n].getX()].getPicture()); 
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(tile[squirrel[n].getTailY()][squirrel[n].getTailX()].getPicture());
-                    //move squirrel right
-                    squirrel[n].move(0, 1);
-                    //check if a hole is filled
-                    if (this.checkHoles(squirrel[n].getY(), squirrel[n].getX()))
+                    //for facing right facing squirrels
+                    else if (squirrel[selected].getDirection() == 90) 
                     {
-                        this.aHoleFilled(squirrel[n].getY(), squirrel[n].getX(), n);
-                        System.out.println("Yay a hole is filled. " + (squirrelNo-holesFilled) + " left to fill!");
-                       
+                        //check only head moveable
+                        if(isItEmpty(squirrel[selected].getY(), squirrel[selected].getX() + 1))
+                        {
+                            moveRight();
+                        }
                     }
-                    //place squirrel
-                    gridB[squirrel[n].getY()][squirrel[n].getX()].setIcon(squirrel[n].getHead());
-                    gridB[squirrel[n].getTailY()][squirrel[n].getTailX()].setIcon(squirrel[n].getTail());
-                    //test for win
-                    ifWin();
+                    //for left facing squirrels check if tail free to move
+                    else if (squirrel[selected].getDirection() == 270)
+                    {
+                        if (isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX() + 1) )
+                        {
+                            moveRight();
+                        }
+                    }
                 }
             }
         }

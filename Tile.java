@@ -10,6 +10,7 @@ public class Tile
     private Picture holeP = new Picture("Hole.png", 0);
     private Picture emptyP = new Picture("Empty.png", 0);
     private Picture originalPicture;
+    private int nutInHole = 0;
 
     public int getTailX()
     {
@@ -30,6 +31,15 @@ public class Tile
     {
         return this.originalPicture;
     }
+    
+    public int nutInHole()
+    {
+        return this.nutInHole;
+    }
+    public void setNutInHole()
+    {
+        this.nutInHole = 1;
+    }
 
     //tile constructor
     public Tile(int y, int x)
@@ -46,6 +56,7 @@ public class Tile
                 {
                     //holes for these tiles
                     this.originalPicture = holeP;
+                    this.nutInHole = 0;
                 }
                 else
                 {
