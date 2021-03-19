@@ -1,6 +1,8 @@
 import javax.swing.JButton;
 
-/** tile class that creates a tile which is on a certain coordinate of x and y and holds a picture*/
+/**
+ * This class represents the original images of the Noisettes board and keeps track of what images each grid contains and its coordinates.
+ */
 public class Tile
 {
     private int x;
@@ -36,12 +38,14 @@ public class Tile
     {
         return this.nutInHole;
     }
-    public void setNutInHole()
+    public void setNutInHole(int n)
     {
-        this.nutInHole = 1;
+        this.nutInHole = n;
     }
 
-    //tile constructor
+    /**
+     * Constructor. Creates a new instance of the Tile class based on what y and x its given, which are used for the (x,y) coordinates of the tile.
+     */
     public Tile(int y, int x)
     {
         this.x = x;

@@ -3,8 +3,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * This class represents a graphical window containing the game board. Once an instance of this is created, it can
+ * be used to create boards, containging three different level buttons and a grid of buttons with pictures.
+ */
 class NoisettesBoard implements ActionListener
 {
+    /**
+     * These are instances of variables and classes
+     */
     //frame and panels
     private JFrame frame = new JFrame();
     private JPanel outerPanel = new JPanel();
@@ -47,6 +54,10 @@ class NoisettesBoard implements ActionListener
     private int j;
 
 
+    /**
+     * Methods used to help do things like set the level of the Noisettes Board
+     * 
+     */
     //method to check if next spot squirrel is moving to is empty
     public boolean isItEmpty(int j, int i)
     {
@@ -81,7 +92,7 @@ class NoisettesBoard implements ActionListener
     {
         holesFilled += 1;
         tile[j][i].setPicture(holeNutP);
-        tile[j][i].setNutInHole();
+        tile[j][i].setNutInHole(1);
         squirrel[n].dropNut();
 
     }
@@ -116,6 +127,7 @@ class NoisettesBoard implements ActionListener
                     //picture of tile is the hole picture
                     tile[j][i].setPicture(holeP);  
                     gridB[j][i].setIcon(holeP);
+                    tile[j][i].setNutInHole(0);
                 }
                 else
                 {
@@ -143,9 +155,11 @@ class NoisettesBoard implements ActionListener
         //place red squirrel
         gridB[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
         gridB[squirrel[0].getTailY()][squirrel[0].getTailX()].setIcon(squirrel[0].getTail());
+        squirrel[0].setNutNo(1);
         //place grey squirrel
         gridB[squirrel[1].getY()][squirrel[1].getX()].setIcon(squirrel[1].getHead()); 
         gridB[squirrel[1].getTailY()][squirrel[1].getTailX()].setIcon(squirrel[1].getTail()); 
+        squirrel[1].setNutNo(1);
         //place flower
         gridB[2][1].setIcon(flowerP);
     }
@@ -157,8 +171,10 @@ class NoisettesBoard implements ActionListener
         squirrelNo = 2;
         //black squirrel
         squirrel[0] = new Squirrel(2, 3,2, 180);
+        squirrel[0].setNutNo(1);
         //brown squirrel
         squirrel[1] = new Squirrel(3, 0,2, 0);
+        squirrel[1].setNutNo(1);
 
         //place grey squirrel
         gridB[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
@@ -176,15 +192,19 @@ class NoisettesBoard implements ActionListener
     {
         resetBoard();
         System.out.println("level 3");
-        squirrelNo = 3;
+        squirrelNo = 4;
         //black squirrel
         squirrel[0] = new Squirrel(2, 2,1, 180);
+        squirrel[0].setNutNo(1);
         //red squirrel
         squirrel[1] = new Squirrel(0, 0,2, 270);
+        squirrel[1].setNutNo(1);
         //brown squirrel
         squirrel[2] = new Squirrel(3, 2,3, 180);
+        squirrel[2].setNutNo(1);
         //grey squirrel
         squirrel[3] = new Squirrel(1, 3,2, 180);
+        squirrel[3].setNutNo(1);
 
         //place black squirrel
         gridB[squirrel[0].getY()][squirrel[0].getX()].setIcon(squirrel[0].getHead()); 
@@ -320,6 +340,10 @@ class NoisettesBoard implements ActionListener
         ifWin();
     }
 
+    /**
+     * Constructor. Creates a new instance of the NoisettesBoard class.
+     * 
+     */
     public NoisettesBoard()
     {   
         //Panel layouts
@@ -391,7 +415,9 @@ class NoisettesBoard implements ActionListener
         frame.setVisible(true);
     }
 
-
+    /**
+     * Action listener to see when a JButton has been pressed and determines what to do when that specific button has been pressed.
+     */
     @Override
     public void actionPerformed(ActionEvent e) 
     {
@@ -615,11 +641,9 @@ class NoisettesBoard implements ActionListener
                 //check for brown and black squirrel's flowers collision
                 if (squirrel[selected].colour() == 2 || squirrel[selected].colour() == 3 )
                 {
-                    System.out.println("1");
                     //check if the location its moving to is empty
                     if(isItEmpty(squirrel[selected].getFlowersY(), squirrel[selected].getFlowersX()-1))
                     {
-                        System.out.println("2");
                         //for down facing squirrels 
                         if ( squirrel[selected].getDirection() == 180)
                         {
@@ -664,7 +688,6 @@ class NoisettesBoard implements ActionListener
                     //if brown/black squirrel facing up
                     else if(squirrel[selected].getDirection() == 0 )
                     {
-                        System.out.println("3");
                         //check both head and tails wont collide
                         if ((isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()-1)) && (isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()-1)))
                         {
@@ -757,14 +780,14 @@ class NoisettesBoard implements ActionListener
                                 this.moveRight();
                             }
                         }
-                        //if squirrel facing up
-                        else if(squirrel[selected].getDirection() == 180 )
+                    }
+                    //if squirrel facing up
+                    else if(squirrel[selected].getDirection() == 180 )
+                    {
+                        //check both head and tails wont collide
+                        if ((isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()+1)) && (isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()+1)))
                         {
-                            //check both head and tails wont collide
-                            if (isItEmpty(squirrel[selected].getY(), squirrel[selected].getX()+1) && isItEmpty(squirrel[selected].getTailY(), squirrel[selected].getTailX()+1))
-                            {
-                                this.moveRight();
-                            }
+                            this.moveRight();
                         }
                     }
                 }

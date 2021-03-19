@@ -1,8 +1,12 @@
 import javax.swing.*;
-
+/**
+ * This class represents a piece used in the Cache Noisettes game. They are squirrels which hold nuts and the information about the squirrel. There are four types of squirrels.
+ */
 public class Squirrel
 {
-
+    /**
+     * Instances.
+     */
     private Picture head;
     private Picture tail;
     private Picture flowers;
@@ -19,6 +23,9 @@ public class Squirrel
     private int degrees;
     private int nutNo = 1;
 
+    /**
+     * Methods: getter and setter methods like mutators which help manage the information of each squirrel piece that is made.
+     */
     public Picture getHead()
     {
         return head;
@@ -82,6 +89,11 @@ public class Squirrel
             nut = true;
         }
         return nut;
+    }
+
+    public void setNutNo(int n)
+    {
+        this.nutNo = n;
     }
 
 
@@ -229,7 +241,11 @@ public class Squirrel
         return moveable;
     }
 
-    
+    /**
+     * Constructor. This creates a new instance of the Squirrel class based on what colour, coordinates, and degree its given. 
+     * These variables determine what type of squirrel is made and where it will be on the board.
+     * The brown and black squirrels are L shaped pieces.
+     */
     public Squirrel(int colour, int x, int y, int degrees)
     {
         //head at (x1,y1) tail at (p,q)
